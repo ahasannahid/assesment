@@ -1,25 +1,3 @@
-// import React from 'react';
-
-// const Problem2 = () => {
-
-//     return (
-
-//         <div className="container">
-//             <div className="row justify-content-center mt-5">
-//                 <h4 className='text-center text-uppercase mb-5'>Problem-2</h4>
-                
-//                 <div className="d-flex justify-content-center gap-3">
-//                 <button className="btn btn-lg btn-outline-primary" type="button" >All Contacts</button>
-//                 <button className="btn btn-lg btn-outline-warning" type="button" >US Contacts</button>
-//                 </div>
-                
-//             </div>
-//         </div>
-//     );
-// };
-
-// export default Problem2;
-
 import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form, FormGroup, FormControl } from 'react-bootstrap';
 
@@ -34,20 +12,32 @@ const Problem2 = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
 
-    const fetchContacts = async () => {
-        // Fetch all contacts
-        const response = await fetch('https://contact.mediusware.com/api/v1/contacts');
-        const data = await response.json();
-        setContacts(data.contacts);
-
-        // Fetch US contacts
-        const usResponse = await fetch('https://contact.mediusware.com/api/v1/contacts?country=US');
-        const usData = await usResponse.json();
-        setUsContacts(usData.contacts);
-    };
+        const fetchContacts = async () => {
+            try {
+              const response = await fetch('https://contact.mediusware.com/api/contacts/');
+              const dat = await response.json(); 
+      
+              setContacts(dat.results);
+            } catch (error) {
+              // console.error('Error fetching data:', error);
+            }
+          };
+          const fetchUsContacts = async () => {
+            try {
+              const response = await fetch('https://contact.mediusware.com/api/country-contacts/United%20States/');
+              const dat = await response.json(); 
+      
+              setUsContacts(dat.results);
+            } catch (error) {
+              // console.error('Error fetching data:', error);
+            }
+          };
+      
+    
 
     useEffect(() => {
         fetchContacts();
+        fetchUsContacts();
     }, []);
 
     useEffect(() => {
@@ -65,7 +55,7 @@ const Problem2 = () => {
         // Filter by search term
         if (searchTerm) {
             filtered = filtered.filter(contact =>
-                contact.name.toLowerCase().includes(searchTerm.toLowerCase())
+                contact.phone.toLowerCase().includes(searchTerm.toLowerCase())
             );
         }
 
@@ -119,7 +109,9 @@ const Problem2 = () => {
                                 <FormControl type="text" placeholder="Search" value={searchTerm} onChange={handleSearchChange} />
                             </FormGroup>
                             <div style={{ maxHeight: '300px', overflowY: 'auto' }} onScroll={handleScroll}>
-                                {/* Render contacts */}
+                                {filteredContacts.map(contact => (
+                                    <div key={contact.id}>{contact.phone}</div>
+                                ))}
                             </div>
                             <FormGroup className="mb-3" controlId="formBasicCheckbox">
                                 <Form.Check type="checkbox" label="Only even" checked={onlyEven} onChange={handleCheckboxChange} />
@@ -143,9 +135,10 @@ const Problem2 = () => {
                                 <FormControl type="text" placeholder="Search" value={searchTerm} onChange={handleSearchChange} />
                             </FormGroup>
                             <div style={{ maxHeight: '300px', overflowY: 'auto' }} onScroll={handleScroll}>
-                                {/* Render US contacts */}
+                                {usContacts.map(contact => (
+                                    <div key={contact.id}>{contact.phone}</div>
+                                ))}
                             </div>
-
                             <FormGroup className="mb-3" controlId="formBasicCheckbox">
                                 <Form.Check type="checkbox" label="Only even" checked={onlyEven} onChange={handleCheckboxChange} />
                             </FormGroup>
@@ -163,6 +156,3 @@ const Problem2 = () => {
 };
 
 export default Problem2;
-
-
-
